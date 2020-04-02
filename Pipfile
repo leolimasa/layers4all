@@ -1,0 +1,14 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+mypy = "*"
+
+[packages]
+jinja2 = "===2.11.1"
+pyyaml = "===5.3.1"
+
+[requires]
+python_version = "3.7"
