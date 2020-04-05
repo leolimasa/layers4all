@@ -1,27 +1,40 @@
 import os
 import yaml
-from .common import render_template_str, parse_commands, read_file, write_file, run_command
+from .common import render_template_str, parse_commands, read_file, write_file, run_command, list_dirs
 from .model import Layer
 from typing import List
 
+
 def from_yaml(yaml_str: str) -> Layer:
-    parsed = yaml.load(yaml_str)  
+    parsed = yaml.load(yaml_str)
     return Layer(
-          name = parsed['name'],
-          injections = parsed['injections'],
-          pre_enable_commands = parse_commands(
-              parsed.get('commands', {}).get('pre-enable',[])),
-          post_enable_commands = parse_commands(
-              parsed.get('commands', {}).get('post-enable', []))
-          )
+        name=parsed['name'],
+        injections=parsed['injections'],
+        pre_enable_commands=parse_commands(
+            parsed.get('commands', {}).get('pre-enable', [])),
+        post_enable_commands=parse_commands(
+            parsed.get('commands', {}).get('post-enable', []))
+    )
+
 
 def from_dir(dir_path: str) -> Layer:
     yaml_path = os.path.join(dir_path, 'layer_config.yaml')
     return from_yaml(read_file(yaml_path))
 
+
+def available_layers(layers_dir: str) -> List[Layer]:
+    layer_dirs = list_dirs(layers_dir)
+    return [
+        from_dir(d)
+        for d in layer_dirs
+        if os.path.exists(os.path.join(d, 'layer_config.yaml'))
+    ]
+
+
 def run_pre_commands(layer: Layer) -> None:
     for c in layer.pre_enable_commands:
         run_command(c)
+
 
 def run_post_commands(layer: Layer) -> None:
     for c in layer.post_enable_commands:

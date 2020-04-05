@@ -29,7 +29,7 @@ Plug#end
 layer enable python
 layer disable python
 layer list
-layer reload
+layer apply
 layer 
   --enabled-layers-file=~/.config/layers4all/enabled 
   --templates-dir=~/.config/layers4all/templates 

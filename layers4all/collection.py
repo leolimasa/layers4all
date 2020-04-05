@@ -1,13 +1,19 @@
-import os
-from . import layer
-from . import Template
-from .model import Collection, Config, Context
-from .common import read_file, dir_names_in_dir
-
-def from_config(config: Config) -> Collection:
-    enabled_layers_str = read_file(config.enabled_layers_file)
-    enabled_layers = [l.strip() for l in enabled_layers_str.split("\n")]
-    templates = dir_names_in_dir(config.templates_dir)
-    
+from . import template
+from typing import Dict, List
+from .model import Context, Layer, Collection
+from functools import reduce
 
 
+def injections(col: Collection) -> Dict[str, List[str]]:
+    result: Dict[str, List[str]] = {}
+    for layer in col.enabled_layers:
+        for k in layer.injections:
+            if not k in result:
+                result[k] = layer.injections[k]
+            else:
+                result[k] = result[k] + layer.injections[k]
+    return result
+
+
+def context(col: Collection) -> Context:
+    return Context(injections=injections(col))
