@@ -1,6 +1,6 @@
 import argparse
 import os
-from . import commands, config
+from . import commands, config, template
 from .model import Config
 
 
@@ -13,27 +13,35 @@ def main() -> None:
         templates_dir=args.templates_dir,
         layers_dir=args.layers_dir
     )
+    try:
+        if action == "list":
+            do_list(cfg)
+        elif action == "enable":
+            enable(cfg, args.layer)
+        elif action == "disable":
+            commands.disable(cfg, args.layer)
+        elif action == "apply":
+            commands.apply(cfg)
+        else:
+            parser.print_help()
+    except template.TemplateYamlFieldMissing as e:
+        print(f'The field "{e.field_name}" is required in {e.yaml_path}')
 
-    if action == "list":
-        do_list(cfg)
-    elif action == "enable":
-        commands.enable(cfg, args.layer)
-    elif action == "disable":
-        commands.disable(cfg, args.layer)
-    elif action == "apply":
-        commands.apply(cfg)
-    else:
-        parser.print_help()
-
+def enable(cfg: Config, layer: str) -> None:
+    result = commands.enable(cfg, layer)
+    if result == commands.EnableStatus.SUCCESS:
+        print(layer + " enabled.")
+    elif result == commands.EnableStatus.ALREADY_ENABLED:
+        print(layer + " was already enabled.")
+    elif result == commands.EnableStatus.LAYER_NOT_FOUND:
+        print(layer + " layer not found")
 
 def do_list(cfg: Config) -> None:
     collection = config.collection(cfg)
-    enabled_layers = [l.name for l in collection.enabled_layers]
-    available_layers = [l.name for l in collection.available_layers]
-
-    for l in sorted(available_layers):
-        checkmark = "✔" if l in enabled_layers else " "
-        print(checkmark + " " + l)
+    enabled_layers = [l.dir_name for l in collection.enabled_layers]
+    for l in collection.available_layers:
+        checkmark = "✔" if l.dir_name in enabled_layers else " "
+        print(checkmark + "\t" + l.dir_name + "\t" + l.name)
 
 
 def make_parser() -> argparse.ArgumentParser:

@@ -7,7 +7,7 @@ ValidParam = Union[Dict[str, List[str]], str]
 
 def render_template_str(template: str, params: Dict[str, ValidParam] = {}) -> str:
     tpl = jj.Template(template)
-    return tpl.render(env=os.environ, *params)
+    return tpl.render(env=os.environ, **params)
 
 
 def render_template_arr(templates: List[str], params: Dict[str, ValidParam] = {}) -> List[str]:
@@ -41,16 +41,22 @@ def run_command(cmd: str) -> None:
 
 
 def dir_names_in_dir(dir_path: str) -> List[str]:
+    if not os.path.exists(dir_path):
+        return []
     return [o for o in os.listdir(dir_path)
             if os.path.isdir(os.path.join(dir_path, o))]
 
 
 def list_dirs(dir_path: str) -> List[str]:
+    if not os.path.exists(dir_path):
+        return []
     return [os.path.join(dir_path, o) for o in os.listdir(dir_path)
             if os.path.isdir(os.path.join(dir_path, o))]
 
 def create_file_if_not_exists(file_path: str) -> None:
-    if not os.path.exists(file_path):
+    dirname = os.path.dirname(file_path)
+    if not os.path.exists(dirname):
         os.makedirs(os.path.dirname(file_path))
+    if not os.path.exists(file_path):
         f = open(file_path, "w")
         f.close()

@@ -2,7 +2,7 @@ import os
 
 from . import layer
 from . import template
-from .common import read_file, dir_names_in_dir, list_dirs, create_file_if_not_exists
+from .common import read_file, list_dirs, list_dirs, create_file_if_not_exists
 from .model import Config, Layer, Template, Collection
 from typing import List
 
@@ -10,6 +10,8 @@ from typing import List
 def enabled_layers(config: Config) -> List[Layer]:
     create_file_if_not_exists(config.enabled_layers_file)
     enabled_layers_str = read_file(config.enabled_layers_file)
+    if enabled_layers_str == '':
+        return []
     enabled_layers = [l.strip() for l in enabled_layers_str.split("\n")]
     return [
         layer.from_dir(os.path.join(config.layers_dir, l))
@@ -18,7 +20,7 @@ def enabled_layers(config: Config) -> List[Layer]:
 
 
 def templates(config: Config) -> List[Template]:
-    template_dirs = dir_names_in_dir(config.templates_dir)
+    template_dirs = list_dirs(config.templates_dir)
     return [template.from_dir(d) for d in template_dirs]
 
 

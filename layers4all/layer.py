@@ -5,10 +5,11 @@ from .model import Layer
 from typing import List
 
 
-def from_yaml(yaml_str: str) -> Layer:
-    parsed = yaml.load(yaml_str)
+def from_yaml(yaml_str: str, dir_name: str) -> Layer:
+    parsed = yaml.load(yaml_str, Loader=yaml.FullLoader)
     return Layer(
         name=parsed['name'],
+        dir_name=dir_name,
         injections=parsed['injections'],
         pre_enable_commands=parse_commands(
             parsed.get('commands', {}).get('pre-enable', [])),
@@ -19,7 +20,7 @@ def from_yaml(yaml_str: str) -> Layer:
 
 def from_dir(dir_path: str) -> Layer:
     yaml_path = os.path.join(dir_path, 'layer_config.yaml')
-    return from_yaml(read_file(yaml_path))
+    return from_yaml(read_file(yaml_path), os.path.basename(dir_path))
 
 
 def available_layers(layers_dir: str) -> List[Layer]:

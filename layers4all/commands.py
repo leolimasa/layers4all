@@ -9,10 +9,15 @@ from dataclasses import dataclass
 class EnableStatus(Enum):
     SUCCESS = 1
     ALREADY_ENABLED = 2
+    LAYER_NOT_FOUND = 3
 
 
 def enable(cfg: Config, layer_name: str) -> EnableStatus:
-    enabled = [l.name for l in config.enabled_layers(cfg)]
+    col = config.collection(cfg)
+    layer_names = [l.dir_name for l in col.available_layers]
+    if not layer_name in layer_names:
+        return EnableStatus.LAYER_NOT_FOUND
+    enabled = [l.name for l in col.enabled_layers]
     if layer_name in enabled:
         return EnableStatus.ALREADY_ENABLED
     write_file(cfg.enabled_layers_file, "\n".join(enabled + [layer_name]))
@@ -25,7 +30,7 @@ class DisableStatus(Enum):
 
 
 def disable(cfg: Config, layer_name: str) -> DisableStatus:
-    enabled = [l.name for l in config.enabled_layers(cfg)]
+    enabled = [l.dir_name for l in config.enabled_layers(cfg)]
     if layer_name not in enabled:
         return DisableStatus.ALREADY_DISABLED
     enabled.remove(layer_name)

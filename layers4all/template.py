@@ -4,10 +4,21 @@ from .common import render_template_str, parse_commands, read_file, write_file, 
 from .model import Template, Context
 
 
-def from_yaml(yaml_str: str, template: str) -> Template:
-    parsed = yaml.load(yaml_str)
+class YamlFieldMissing(Exception):
+    def __init__(self, field: str):
+        self.field_name = field
+
+
+def from_yaml(yaml_str: str, template: str, dir_name: str) -> Template:
+    parsed = yaml.load(yaml_str, Loader=yaml.FullLoader)
+    required_fields = ['name', 'destination']
+    for f in required_fields:
+        if f not in parsed:
+            raise YamlFieldMissing(f)
+
     return Template(
         name=parsed['name'],
+        dir_name=dir_name,
         dest=render_template_str(parsed['destination']),
         template=template,
         pre_enable_commands=parse_commands(
@@ -17,12 +28,21 @@ def from_yaml(yaml_str: str, template: str) -> Template:
     )
 
 
+class TemplateYamlFieldMissing(Exception):
+    def __init__(self, yaml_path: str , field_name: str):
+        self.yaml_path = yaml_path 
+        self.field_name = field_name
+
+
 def from_dir(dir_path: str) -> Template:
     template_yaml_path = os.path.join(dir_path, "template_config.yaml")
     template_jinja_path = os.path.join(dir_path, "template.jinja")
     template_yaml = read_file(template_yaml_path)
     template_jinja = read_file(template_jinja_path)
-    return from_yaml(template_yaml, template_jinja)
+    try:
+        return from_yaml(template_yaml, template_jinja, os.path.basename(dir_path))
+    except YamlFieldMissing as e:
+        raise TemplateYamlFieldMissing(template_yaml_path, e.field_name)
 
 
 def render(ctx: Context, template: Template) -> str:

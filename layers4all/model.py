@@ -17,6 +17,7 @@ class Config:
 @dataclass
 class Layer:
     name: str
+    dir_name: str
     injections: Dict[str, List[str]]
     pre_enable_commands: List[str]
     post_enable_commands: List[str]
@@ -25,6 +26,7 @@ class Layer:
 @dataclass
 class Template:
     name: str
+    dir_name: str
     dest: str
     template: str
     pre_enable_commands: List[str]
