@@ -19,8 +19,8 @@ class Layer:
     name: str
     dir_name: str
     injections: Dict[str, List[str]]
-    pre_enable_commands: List[str]
-    post_enable_commands: List[str]
+    pre_template_commands: List[str]
+    post_template_commands: List[str]
 
 
 @dataclass
@@ -29,8 +29,8 @@ class Template:
     dir_name: str
     dest: str
     template: str
-    pre_enable_commands: List[str]
-    post_enable_commands: List[str]
+    pre_save_commands: List[str]
+    post_save_commands: List[str]
 
 
 @dataclass

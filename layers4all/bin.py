@@ -1,6 +1,6 @@
 import argparse
 import os
-from . import commands, config, template
+from . import commands, config, template, layer
 from .model import Config
 
 
@@ -22,6 +22,8 @@ def main() -> None:
             commands.disable(cfg, args.layer)
         elif action == "apply":
             commands.apply(cfg)
+        elif action == "new_layer":
+            layer.new(cfg.layers_dir, args.layer)
         else:
             parser.print_help()
     except template.TemplateYamlFieldMissing as e:
@@ -63,6 +65,11 @@ def make_parser() -> argparse.ArgumentParser:
     disable_sub = subparsers.add_parser('disable')
     disable_sub.add_argument('layer', help='Layer name to disable')
     disable_sub.add_argument(action='store_const', dest='action', const='disable')
+
+    new_layer = subparsers.add_parser('new')
+    new_layer.add_argument('layer', help='Layer name to create')
+    new_layer.add_argument(action='store_const', dest='action', const='new_layer')
+
 
     parser.add_argument(
         '--enabled-layers-file',

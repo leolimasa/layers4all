@@ -19,12 +19,12 @@ def from_yaml(yaml_str: str, template: str, dir_name: str) -> Template:
     return Template(
         name=parsed['name'],
         dir_name=dir_name,
-        dest=render_template_str(parsed['destination']),
+        dest=os.path.expanduser(render_template_str(parsed['destination'])),
         template=template,
-        pre_enable_commands=parse_commands(
-            parsed.get('commands', {}).get('pre-enable', [])),
-        post_enable_commands=parse_commands(
-            parsed.get('commands', {}).get('post-enable', []))
+        pre_save_commands=parse_commands(
+            parsed.get('commands', {}).get('pre-save', [])),
+        post_save_commands=parse_commands(
+            parsed.get('commands', {}).get('post-save', []))
     )
 
 
@@ -58,10 +58,10 @@ def save(ctx: Context, template: Template) -> None:
 
 
 def run_pre_commands(template: Template) -> None:
-    for c in template.pre_enable_commands:
+    for c in template.pre_save_commands:
         run_command(c)
 
 
 def run_post_commands(template: Template) -> None:
-    for c in template.post_enable_commands:
+    for c in template.post_save_commands:
         run_command(c)

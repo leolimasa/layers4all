@@ -46,13 +46,13 @@ def apply(cfg: Config) -> None:
         template.run_pre_commands(t)
 
     for l in col.enabled_layers:
-        layer.run_pre_commands(l)
+        layer.run_pre_commands(cfg.layers_dir, l)
 
     for t in col.templates:
         template.save(ctx, t)
 
     for l in col.enabled_layers:
-        layer.run_post_commands(l)
+        layer.run_post_commands(cfg.layers_dir, l)
 
     for t in col.templates:
         template.run_post_commands(t)
