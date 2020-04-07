@@ -3,7 +3,7 @@ import os
 from . import layer
 from . import template
 from .common import read_file, list_dirs, list_dirs, create_file_if_not_exists
-from .model import Config, Layer, Template, Collection
+from .model import Config, Layer, Template, Collection, TemplateConfig
 from typing import List
 
 
@@ -19,7 +19,7 @@ def enabled_layers(config: Config) -> List[Layer]:
     ]
 
 
-def templates(config: Config) -> List[Template]:
+def templates(config: Config) -> List[TemplateConfig]:
     template_dirs = list_dirs(config.templates_dir)
     return [template.from_dir(d) for d in template_dirs]
 

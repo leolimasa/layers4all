@@ -22,13 +22,16 @@ class Layer:
     pre_template_commands: List[str]
     post_template_commands: List[str]
 
-
 @dataclass
 class Template:
+    dest: str
+    template_str: str
+
+@dataclass
+class TemplateConfig:
     name: str
     dir_name: str
-    dest: str
-    template: str
+    templates: List[Template]
     pre_save_commands: List[str]
     post_save_commands: List[str]
 
@@ -49,4 +52,4 @@ class Collection:
     '''
     available_layers: List[Layer]
     enabled_layers: List[Layer]
-    templates: List[Template]
+    templates: List[TemplateConfig]

@@ -17,7 +17,7 @@ def enable(cfg: Config, layer_name: str) -> EnableStatus:
     layer_names = [l.dir_name for l in col.available_layers]
     if not layer_name in layer_names:
         return EnableStatus.LAYER_NOT_FOUND
-    enabled = [l.name for l in col.enabled_layers]
+    enabled = [l.dir_name for l in col.enabled_layers]
     if layer_name in enabled:
         return EnableStatus.ALREADY_ENABLED
     write_file(cfg.enabled_layers_file, "\n".join(enabled + [layer_name]))

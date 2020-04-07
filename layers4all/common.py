@@ -60,3 +60,12 @@ def create_file_if_not_exists(file_path: str) -> None:
     if not os.path.exists(file_path):
         f = open(file_path, "w")
         f.close()
+
+class FieldMissing(Exception):
+    def __init__(self, field: str):
+        self.field_name = field
+
+def require_fields(fields: List[str], parsed: Dict[str, Any]) -> None:
+    for f in fields:
+        if f not in parsed:
+            raise FieldMissing(f)

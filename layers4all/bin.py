@@ -1,7 +1,8 @@
 import argparse
 import os
 from . import commands, config, template, layer
-from .model import Config
+from tabulate import tabulate
+from .model import Config, Layer
 
 
 def main() -> None:
@@ -26,8 +27,9 @@ def main() -> None:
             layer.new(cfg.layers_dir, args.layer)
         else:
             parser.print_help()
-    except template.TemplateYamlFieldMissing as e:
+    except template.TemplateConfigYamlFieldMissing as e:
         print(f'The field "{e.field_name}" is required in {e.yaml_path}')
+
 
 def enable(cfg: Config, layer: str) -> None:
     result = commands.enable(cfg, layer)
@@ -38,12 +40,23 @@ def enable(cfg: Config, layer: str) -> None:
     elif result == commands.EnableStatus.LAYER_NOT_FOUND:
         print(layer + " layer not found")
 
+
 def do_list(cfg: Config) -> None:
     collection = config.collection(cfg)
     enabled_layers = [l.dir_name for l in collection.enabled_layers]
-    for l in collection.available_layers:
-        checkmark = "✔" if l.dir_name in enabled_layers else " "
-        print(checkmark + "\t" + l.dir_name + "\t" + l.name)
+    available_layers = sorted(
+        collection.available_layers, key=lambda l: l.dir_name)
+    table = [
+        [
+            " ✔" if l.dir_name in enabled_layers else " ",
+            l.dir_name,
+            l.name
+        ]
+        for l in available_layers
+    ]
+    print(tabulate(table, 
+        headers=["ENABLED", "DIR", "NAME"],
+        tablefmt="plain"))
 
 
 def make_parser() -> argparse.ArgumentParser:
@@ -60,16 +73,18 @@ def make_parser() -> argparse.ArgumentParser:
 
     enable_sub = subparsers.add_parser('enable')
     enable_sub.add_argument('layer', help='Layer name to enable')
-    enable_sub.add_argument(action='store_const', dest='action', const='enable')
+    enable_sub.add_argument(action='store_const',
+                            dest='action', const='enable')
 
     disable_sub = subparsers.add_parser('disable')
     disable_sub.add_argument('layer', help='Layer name to disable')
-    disable_sub.add_argument(action='store_const', dest='action', const='disable')
+    disable_sub.add_argument(action='store_const',
+                             dest='action', const='disable')
 
     new_layer = subparsers.add_parser('new')
     new_layer.add_argument('layer', help='Layer name to create')
-    new_layer.add_argument(action='store_const', dest='action', const='new_layer')
-
+    new_layer.add_argument(action='store_const',
+                           dest='action', const='new_layer')
 
     parser.add_argument(
         '--enabled-layers-file',

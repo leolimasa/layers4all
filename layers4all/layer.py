@@ -7,10 +7,12 @@ from typing import List
 
 def from_yaml(yaml_str: str, dir_name: str) -> Layer:
     parsed = yaml.load(yaml_str, Loader=yaml.FullLoader)
+    injections = parsed['injections'] if 'injections' in parsed else {}
+
     return Layer(
         name=parsed['name'],
         dir_name=dir_name,
-        injections=parsed['injections'],
+        injections=injections,
         pre_template_commands=parse_commands(
             parsed.get('commands', {}).get('pre-template', [])),
         post_template_commands=parse_commands(
