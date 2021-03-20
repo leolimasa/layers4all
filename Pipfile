@@ -8,7 +8,7 @@ mypy = "*"
 autopep8 = "*"
 
 [packages]
-jinja2 = "===2.11.1"
+jinja2 = "===2.11.3"
 pyyaml = "===5.3.1"
 tabulate = "==0.8.7"
 
